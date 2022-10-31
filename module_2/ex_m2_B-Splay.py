@@ -134,30 +134,6 @@ class SplayTree:
             self.root = self.splay(previuos)
         return current
 
-    def print(self):
-        if self.empty():
-            print("_")
-            return
-        print("[{} {}]".format(self.root.key, self.root.value))
-        currentLevel = [self.root.left, self.root.right]
-        ifContinue = True
-        while ifContinue:
-            ifContinue = False
-            newLevel, outputLevel = [None] * (len(currentLevel) * 2), [None] * len(currentLevel)
-            for _ in range(len(currentLevel)):
-                if currentLevel[_]:
-                    outputLevel[_] = "[{} {} {}]".format(currentLevel[_].key, currentLevel[_].value, currentLevel[_].parent.key)
-                    if currentLevel[_].left:
-                        newLevel[_ * 2] = currentLevel[_].left
-                        ifContinue = True
-                    if currentLevel[_].right:
-                        newLevel[_ * 2 + 1] = currentLevel[_].right
-                        ifContinue = True
-                else:
-                    outputLevel[_] = "_"
-            currentLevel = newLevel
-            print(" ".join(outputLevel))
-
     def merge(self, tree1, tree2):
         if tree1 == None:
             return tree2
@@ -171,6 +147,63 @@ class SplayTree:
         if tree2 != None:
             tree2.parent = tree1
         return tree1
+
+def printTree(tree):
+    if tree.empty():
+        print("_")
+        return
+    print("[{} {}]".format(tree.root.key, tree.root.value))
+    currentNodes, nextNodes = {}, {}
+    if tree.root.left:
+        currentNodes[len(currentNodes)] = tree.root.left
+    else:
+        currentNodes[len(currentNodes)] = 1
+
+    if tree.root.right:
+        currentNodes[len(currentNodes)] = tree.root.right
+    elif not tree.root.left:
+        currentNodes[len(currentNodes)-1] = 2
+    else:
+        currentNodes[len(currentNodes)] = 1
+        
+    while True:
+        if len(currentNodes) == 1 and type(currentNodes[0]) == int:
+            break
+        count = len(currentNodes)
+        for _ in range(count):
+            firstEl = currentNodes.pop(_)
+            if type(firstEl) == int:
+                if _ == count - 1:
+                    print((firstEl-1) * '_ ', end='_\n')
+                else:
+                    print((firstEl-1) * '_ ', end='_ ')
+                if len(nextNodes) > 0 and type(nextNodes[len(nextNodes)-1]) == int:
+                    nextNodes[len(nextNodes)-1] += firstEl * 2
+                else:
+                    nextNodes[len(nextNodes)] = firstEl * 2
+            else:
+                if _ == count - 1:
+                    print("[{} {} {}]".format(firstEl.key, firstEl.value, firstEl.parent.key), end='\n')
+                else:
+                    print("[{} {} {}]".format(firstEl.key, firstEl.value, firstEl.parent.key), end=' ')
+
+                if firstEl.left:
+                    nextNodes[len(nextNodes)] = firstEl.left
+                else:
+                    if len(nextNodes) > 0 and type(nextNodes[len(nextNodes)-1]) == int:
+                        nextNodes[len(nextNodes)-1] += 1
+                    else:
+                        nextNodes[len(nextNodes)] = 1
+                        
+                if firstEl.right:
+                    nextNodes[len(nextNodes)] = firstEl.right
+                else:
+                    if len(nextNodes) > 0 and type(nextNodes[len(nextNodes)-1]) == int:
+                        nextNodes[len(nextNodes)-1] += 1
+                    else:
+                        nextNodes[len(nextNodes)] = 1
+        currentNodes = nextNodes
+        nextNodes = {}
 
 def main():
     tree = SplayTree()
@@ -230,7 +263,7 @@ def main():
             except:
                 print("0")
         elif command == "print":
-            tree.print()
+            printTree(tree)
         else:
             print("error")
 
