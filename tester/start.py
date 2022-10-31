@@ -6,9 +6,9 @@ testTimes = {}
 def test(file):
     sys.stdin = open('input/{}'.format(file), "r", encoding="utf8")
     sys.stdout = open('output/{}'.format(file), "w", encoding="utf8")
-    import ejudjeTester
+    import program
     startTime = time.time()
-    ejudjeTester.main()
+    program.main()
     endTime = time.time()
     testTimes[file] = (endTime-startTime)
     sys.stdin.close()
