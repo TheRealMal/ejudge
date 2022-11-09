@@ -15,7 +15,7 @@ class RadixTree:
     Сложность O(n * m), где n - длина слова, m - высота дерева
     '''
     def add(self, s):
-        self.__addToNode(self.root, s)
+        self.__addToNode(self.root, s.lower())
 
     def __addToNode(self, node, s):
         if s[0] not in node.childs:
@@ -58,10 +58,10 @@ class RadixTree:
     поиск 'подсказок' для автозамены ошибки в слове
     '''
     def check(self, s):
-        if self.__search(s):
+        if self.__search(s.lower()):
             return [s]
         else:
-            return self.__searchCorrections(s)
+            return self.__searchCorrections(s.lower())
 
     '''
     Функция __search обеспечивает поиск слова в дереве
@@ -165,7 +165,7 @@ def main():
 
     for _ in range(wordsQuantity):
         try:
-            word = input().lower()
+            word = input()
         except EOFError:
             return
         if len(word) == 0:
@@ -179,9 +179,9 @@ def main():
             return
         if len(inp) == 0:
             continue
-        result = trie.check(inp.lower())
+        result = trie.check(inp)
         if len(result) > 0:
-            if result[0] == inp.lower():
+            if result[0] == inp:
                 print("{} - ok".format(inp))
                 continue
             result.sort()
