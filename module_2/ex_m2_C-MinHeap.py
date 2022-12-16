@@ -1,3 +1,5 @@
+import math
+
 class Node:
     def __init__(self, key, value):
         self.key = key
@@ -49,12 +51,15 @@ class MinHeap:
     def max(self):
         if self.empty():
             raise LookupError
-        maxIndex = 0
-        for _ in range(len(self.arr)):
-            if self.arr[_].key > self.arr[maxIndex].key:
-                maxIndex = _
-        return [maxIndex, self.arr[maxIndex]]
-    
+        iLast = len(self.arr) - 1
+        tryLast = iLast - (2 ** math.ceil(math.log(iLast, 2)))
+        iMax = iLast
+        iLast -= 1
+        for _ in range(iLast, tryLast, -1):
+            if self.arr[_].key > self.arr[iMax].key:
+                iMax = _
+        return [iMax, self.arr[iMax]]
+
     def remove(self, key):
         x = self.table.get(key, None)
         if x is None:
