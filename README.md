@@ -1,7 +1,7 @@
-# ejudje
- BMSTU IU8-5 Ejudje tasks
+# ejudge
+ BMSTU IU8-5 Ejudge tasks
 
-# ejudje tester
+# ejudge tester
 ## program.py
 Тестируемая программа
 ## start.py
