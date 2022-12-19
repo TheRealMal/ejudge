@@ -33,22 +33,23 @@ def buildPaths(node, current_path, checked):
     if node.isDir:
         print(" ".join(current_path[::-1]))
     for parent in node.parents:
-        buildPaths(parent, current_path + [parent.name], checked)
-    current_path.pop()
+        current_path.append(parent.name)
+        buildPaths(parent, current_path, checked)
+        current_path.pop()
     checked.remove(node.name)
 
-def buildAllPaths(graph):
+def buildAllPaths(graph, arr_vuln):
     for vuln in arr_vuln:
         buildPaths(graph.nodes.get(vuln), [vuln], set())
 
-if __name__ == "__main__":
+def main():
     try:
         arr_vuln = input().split(" ")
         arr_dirs = input().split(" ")
     except EOFError:
-        exit()
+        return
     if arr_vuln[0] == '' or arr_dirs[0] == '':
-        exit()
+        return
 
     graph = Graph()
     arr_vuln = set(arr_vuln)
@@ -69,4 +70,7 @@ if __name__ == "__main__":
             graph.addChildNode(inp[0], item)
             graph.addParentNode(item, inp[0])
 
-    buildAllPaths(graph)
+    buildAllPaths(graph, arr_vuln)
+
+if __name__ == "__main__":
+    main()

@@ -98,58 +98,59 @@ class RadixTree:
     = O(n^2 * m)
     '''
     def __searchCorrections(self, s):
-        return self.__searchCorrectionsInNode(self.root, s, prefix="", prefixLen=0, m=False)
+        return self.__searchCorrectionsInNode(self.root, s)
 
-    def __searchCorrectionsInNode(self, node, s, prefix="", prefixLen=0, m=False):
+    def __searchCorrectionsInNode(self, node, s, prefix="", prefixIndex=0, pm=False):
         result = []
-        if m:
-            if prefixLen < len(s) and s[prefixLen] in node.childs:
-                i = node.childs[s[prefixLen]]
-                if s[prefixLen:prefixLen + len(i.word)] != i.word:
+        if pm:
+            if prefixIndex < len(s) and s[prefixIndex] in node.childs:
+                i = node.childs[s[prefixIndex]]
+                if s[prefixIndex:prefixIndex + len(i.word)] != i.word:
                     return []
-                elif i.isWord and i.word == s[prefixLen:]:
+                elif i.isWord and i.word == s[prefixIndex:]:
                     result.append(prefix + i.word)
-                result += self.__searchCorrectionsInNode(i, s, prefix=prefix + i.word, prefixLen=prefixLen + len(i.word), m=True)
+                result += self.__searchCorrectionsInNode(i, s, prefix=prefix + i.word, prefixIndex=prefixIndex + len(i.word), pm=True)
         else:
             for child in node.childs.values():
                 i = len(child.word)
                 for _ in range(i):
-                    if len(s) <= (prefixLen + _) or s[prefixLen + _] != child.word[_]:
+                    if len(s) <= (prefixIndex + _) or s[prefixIndex + _] != child.word[_]:
                         i = _
                         break
                 else:
                     if child.isWord and len(s) - 1 <= len(prefix + child.word) <= len(s):
                         result.append(prefix + child.word)
-                    result += self.__searchCorrectionsInNode(child, s, prefix=prefix + child.word, prefixLen=prefixLen + i, m=False)
+                    result += self.__searchCorrectionsInNode(child, s, prefix=prefix + child.word, prefixIndex=prefixIndex + i, pm=False)
                     continue
-                self.__mistakeDiffSymbol(child, s, prefix, prefixLen, i, result)
-                self.__mistakeMissingSymbol(child, s, prefix, prefixLen, i, result)
-                self.__mistakeExtraSymbol(child, s, prefix, prefixLen, i, result)
-                self.__mistakeTransposition(child, s, prefix, prefixLen, i, result)
+                self.__mistakeDiffSymbol(child, s, prefix, prefixIndex, i, result)
+                self.__mistakeMissingSymbol(child, s, prefix, prefixIndex, i, result)
+                self.__mistakeExtraSymbol(child, s, prefix, prefixIndex, i, result)
+                self.__mistakeTransposition(child, s, prefix, prefixIndex, i, result)
         return result    
 
-    def __mistakeDiffSymbol(self, child, s, prefix, prefixLen, i, result):
-        if child.word[i+1:] == s[prefixLen + i + 1:len(prefix + child.word)]:
+    def __mistakeDiffSymbol(self, child, s, prefix, prefixIndex, i, result):
+        if child.word[i+1:] == s[prefixIndex + i + 1:len(prefix + child.word)]:
             if child.isWord and len(prefix + child.word) == len(s): result.append(prefix + child.word)
-            result += self.__searchCorrectionsInNode(child, s, prefix=prefix + child.word, prefixLen=prefixLen + len(child.word), m=True)
+            result += self.__searchCorrectionsInNode(child, s, prefix=prefix + child.word, prefixIndex=prefixIndex + len(child.word), pm=True)
     
-    def __mistakeMissingSymbol(self, child, s, prefix, prefixLen, i, result):
-        if child.word[i+1:] == s[prefixLen + i:len(prefix + child.word) - 1]:
+    def __mistakeMissingSymbol(self, child, s, prefix, prefixIndex, i, result):
+        if child.word[i+1:] == s[prefixIndex + i:len(prefix + child.word) - 1]:
             if child.isWord and len(prefix + child.word) == len(s) + 1: result.append(prefix + child.word)
-            result += self.__searchCorrectionsInNode(child, s, prefix=prefix + child.word, prefixLen=prefixLen + len(child.word) - 1, m=True)
+            result += self.__searchCorrectionsInNode(child, s, prefix=prefix + child.word, prefixIndex=prefixIndex + len(child.word) - 1, pm=True)
     
-    def __mistakeExtraSymbol(self, child, s, prefix, prefixLen, i, result):
-        if child.word[i:] == s[prefixLen + i + 1:len(prefix + child.word) + 1]:
+    def __mistakeExtraSymbol(self, child, s, prefix, prefixIndex, i, result):
+        if child.word[i:] == s[prefixIndex + i + 1:len(prefix + child.word) + 1]:
             if child.isWord and len(prefix + child.word) == len(s) - 1: result.append(prefix + child.word)
-            result += self.__searchCorrectionsInNode(child, s, prefix=prefix + child.word, prefixLen=prefixLen + len(child.word) + 1, m=True)
+            result += self.__searchCorrectionsInNode(child, s, prefix=prefix + child.word, prefixIndex=prefixIndex + len(child.word) + 1, pm=True)
     
-    def __mistakeTransposition(self, child, s, prefix, prefixLen, i, result): #
-        if prefixLen + i + 1 < len(s) and s[prefixLen + i] in child.childs and s[prefixLen + i + 1] == child.word[i]:
+    def __mistakeTransposition(self, child, s, prefix, prefixIndex, i, result): #
+        if prefixIndex + i + 1 < len(s) and s[prefixIndex + i] in child.childs and s[prefixIndex + i + 1] == child.word[i]:
             if child.isWord and len(prefix + child.word) == len(s): result.append(prefix + child.word)
-            result += self.__searchCorrectionsInNode(child, "{}{}{}{}".format(s[:prefixLen+i], s[prefixLen+i+1], s[prefixLen+i], s[prefixLen+i+2:]), prefix=prefix + child.word, prefixLen=prefixLen + len(child.word), m=True)
-        elif i + 1 < len(child.word) and prefixLen + i + 1 < len(s) and child.word[i] == s[prefixLen + i + 1] and child.word[i + 1] == s[prefixLen + i] and child.word[i + 2:] == s[prefixLen + i + 2:len(prefix + child.word)]:
+            correction = s[:prefixIndex+i] + s[prefixIndex+i+1] + s[prefixIndex+i] + s[prefixIndex+i+2:]
+            result += self.__searchCorrectionsInNode(child, correction, prefix=prefix + child.word, prefixIndex=prefixIndex + len(child.word), pm=True)
+        elif i + 1 < len(child.word) and prefixIndex + i + 1 < len(s) and child.word[i] == s[prefixIndex + i + 1] and child.word[i + 1] == s[prefixIndex + i] and child.word[i + 2:] == s[prefixIndex + i + 2:len(prefix + child.word)]:
             if child.isWord and len(prefix + child.word) == len(s): result.append(prefix + child.word)
-            result += self.__searchCorrectionsInNode(child, s, prefix=prefix + child.word, prefixLen=prefixLen + len(child.word), m=True)
+            result += self.__searchCorrectionsInNode(child, s, prefix=prefix + child.word, prefixIndex=prefixIndex + len(child.word), pm=True)
     
 def main():
     trie = RadixTree()

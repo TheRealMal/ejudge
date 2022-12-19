@@ -1,7 +1,0 @@
-som -> some
-rando -> random
-wordz -> words
-fore -> for
-testeng -> testing
-yoru -> your
-solutiosn -> solutions
